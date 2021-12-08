@@ -10,6 +10,7 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public Text highScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -22,6 +23,7 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        highScoreText.text = "Highest Score : " + GameManager.Instance.highestScoreName + " - " + GameManager.Instance.highestScore;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -59,6 +61,9 @@ public class MainManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                SceneManager.LoadScene(0);
         }
     }
 
@@ -68,8 +73,21 @@ public class MainManager : MonoBehaviour
         ScoreText.text = $"Score : {m_Points}";
     }
 
+    void CheckForHighScore()
+    {
+        if (m_Points > GameManager.Instance.highestScore)
+        {
+            GameManager.Instance.highestScoreName = GameManager.Instance.playerName;
+            highScoreText.text = "Highest Score : " + GameManager.Instance.highestScoreName + " - " + m_Points;
+            GameManager.Instance.highestScore = m_Points;
+            GameManager.Instance.SaveStats();
+        }
+    }
+
     public void GameOver()
     {
+        CheckForHighScore();
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
